@@ -1,0 +1,7 @@
+---
+
+- name: Install namespaces
+  include: namespace.yml
+  loop: '{{ k8s_namespaces }}'
+  loop_control:
+    loop_var: namespace

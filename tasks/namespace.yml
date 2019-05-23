@@ -1,0 +1,60 @@
+---
+
+- name: Install namespace
+  k8s:
+    state: present
+    kind: Namespace
+    name: '{{ namespace.name }}'
+
+- name: Install service account
+  k8s:
+    state: present
+    definition:
+      kind: ServiceAccount
+      metadata:
+        namespace: '{{ namespace.name }}'
+        name: '{{ namespace.name }}'
+
+- name: Setup ServiceAccount role
+  k8s:
+    state: present
+    definition:
+      apiVersion: rbac.authorization.k8s.io/v1
+      kind: Role
+      metadata:
+        namespace: '{{ namespace.name }}'
+        name: '{{ namespace.name }}'
+      rules:
+      - apiGroups: ['']
+        resources: ['*']
+        verbs: ['*']
+
+- name: Setup ServiceAccount role binding
+  k8s:
+    state: present
+    definition:
+      kind: RoleBinding
+      apiVersion: rbac.authorization.k8s.io/v1
+      metadata:
+        namespace: '{{ namespace.name }}'
+        name: '{{ namespace.name }}'
+      subjects:
+      - kind: ServiceAccount
+        namespace: '{{ namespace.name }}'
+        name: '{{ namespace.name }}'
+      roleRef:
+        kind: Role
+        name: '{{ namespace.name }}'
+        apiGroup: rbac.authorization.k8s.io
+
+- name: Install secret
+  k8s:
+    state: present
+    definition:
+      kind: Secret
+      type: kubernetes.io/service-account-token
+      metadata:
+        annotations:
+          kubernetes.io/service-account.name: '{{ namespace.name }}'
+        namespace: '{{ namespace.name }}'
+        name: '{{ namespace.name }}-token'

@@ -1,0 +1,20 @@
+---
+
+- name: Ensure user exists
+  user:
+    name: '{{ lookup("env", "USER") }}'
+    state: present
+
+- name: Install your user
+  include: user.yml
+  vars:
+    user:
+      name: '{{ lookup("ENV", "USER") }}'
+      roles:
+        k8s:
+
+- name: Install your namespace
+  include: namespace.yml
+  vars:
+    namespace:
+      name: '{{ lookup("env", "USER") }}'

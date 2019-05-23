@@ -1,0 +1,8 @@
+---
+
+- name: Install users
+  include: user.yml
+  when: user.get('roles', {}).get('k8s')
+  loop: '{{ users }}'
+  loop_control:
+    loop_var: user

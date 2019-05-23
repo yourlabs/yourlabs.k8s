@@ -1,0 +1,51 @@
+---
+
+- name: Configure kubelet --fail-on-swap
+  when: k8s_swap
+  copy:
+    content: KUBELET_EXTRA_ARGS="--fail-swap-on=false --network-plugin=cni --cni-conf-dir=/etc/cni/net.d --allow-privileged=true"
+    dest: /etc/default/kubelet
+
+- name: Reset Kubernetes component
+  shell: kubeadm reset --force
+  register: reset_cluster
+
+- name: Reset iptables
+  shell: iptables -F && iptables -t nat -F && iptables -t mangle -F && iptables -X
+
+
+- name: Reset ipvs
+  shell: ipvsadm --clear
+  failed_when: false
+
+- name: Pull for Kubernetes cluster init
+  when: reset_cluster is succeeded
+  shell: |
+    kubeadm config images pull --kubernetes-version {{ k8s_version }}
+
+- name: Init Kubernetes cluster
+  when: reset_cluster is succeeded
+  shell: |
+    kubeadm init --service-cidr {{ k8s_service_cidr }} \
+                 --kubernetes-version {{ k8s_version }} \
+                 --pod-network-cidr {{ k8s_pod_network_cidr }} \
+                 --token {{ k8s_token }} \
+                 --apiserver-advertise-address {{ k8s_master_ip }} \
+                 {% if k8s_swap %}--ignore-preflight-errors Swap{% endif %}
+  register: init_cluster
+
+- name: Create Kubernetes config directory
+  file:
+    path: /root/.kube/
+    state: directory
+
+- name: Copy admin.conf to Home directory
+  when: init_cluster is succeeded
+  copy:
+    src: /etc/kubernetes/admin.conf
+    dest: '/root/.kube/config'
+    mode: 0700
+    remote_src: true
+
+- name: Install kuberouter-all-features
+  shell: kubectl apply -f https://raw.githubusercontent.com/cloudnativelabs/kube-router/master/daemonset/kubeadm-kuberouter-all-features.yaml

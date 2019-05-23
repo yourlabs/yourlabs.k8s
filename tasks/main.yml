@@ -1,0 +1,14 @@
+---
+
+- name: Ensure docker was setup once on this host
+  include_role: name=yourlabs.docker
+
+- include: setup.yml
+
+- name: Install users
+  include: users.yml
+  when: users|default()
+
+- name: Install namespaces
+  include: namespaces.yml
+  when: namespaces|default()

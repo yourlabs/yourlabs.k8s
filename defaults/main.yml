@@ -1,0 +1,45 @@
+---
+
+k8s_packages:
+- kubeadm
+- kubelet
+- kubectl
+
+k8s_service_cidr: '10.96.0.0/12'
+k8s_pod_network_cidr: '10.244.0.0/16'
+k8s_version: v1.14.0
+k8s_token: '000000.0000000000000000'
+k8s_master_ip: '{{ ansible_default_ipv4.address }}'
+k8s_common_name: '{{ ansible_default_ipv4.address }}'
+k8s_swap: true
+
+k8s_dashboard: true
+k8s_namespaces: []
+
+# 1.8.x feature: --feature-gates SelfHosting=true
+# init_opts: ""
+#
+# # Any other additional opts you want to add..
+# kubeadm_opts: ""
+# # For example:
+# # kubeadm_opts: '--apiserver-cert-extra-sans "k8s.domain.com,kubernetes.domain.com"'
+#
+#
+# # Network implementation('flannel', 'calico')
+# network: calico
+#
+# # Change this to an appropriate interface, preferably a private network.
+# # For example, on DigitalOcean, you would use eth1 as that is the default private network interface.
+# network_interface: ""
+#
+# enable_dashboard: yes
+#
+# # A list of insecure registries you might need to define
+# insecure_registries: []
+# # insecure_registries: ['gcr.io']
+#
+# systemd_dir: /lib/systemd/system
+# system_env_dir: /etc/sysconfig
+# network_dir: /etc/kubernetes/network
+# kubeadmin_config: /etc/kubernetes/admin.conf
+# kube_addon_dir: /etc/kubernetes/addon

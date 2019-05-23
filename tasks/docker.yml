@@ -1,0 +1,21 @@
+---
+- name: Install docker
+  include_role: name=yourlabs.roleonce
+  vars:
+    name: docker
+
+- name: Setup docker for k8s
+  copy:
+    dest: /etc/docker/daemon.json
+    content: |
+      {
+        "exec-opts": ["native.cgroupdriver=systemd"],
+        "log-driver": "json-file",
+        "log-opts": {
+          "max-size": "100m"
+        },
+        "storage-driver": "overlay2"
+      }
+
+- name: Restart docker
+  service: name=docker state=restarted

@@ -1,0 +1,12 @@
+---
+
+- name: Pip install openshift on target host
+  include_role: name=yourlabs.pip
+  vars:
+    name: openshift
+
+#- name: Pip install openshift localhost
+#  delegate_to: localhost
+#  include_role: name=yourlabs.pip
+#  vars:
+#    name: openshift

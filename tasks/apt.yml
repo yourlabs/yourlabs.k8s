@@ -1,0 +1,21 @@
+---
+
+- name: Install google apt repo
+  include_role:
+    name: yourlabs.aptrepo
+  vars:
+    key_id: '54A647F9048D5688D7DA2ABE6A030B21BA07F4FB'
+    key_url: https://packages.cloud.google.com/apt/doc/apt-key.gpg
+    repo: deb [arch=amd64] https://apt.kubernetes.io/ kubernetes-xenial main
+
+- name: Install kubeadm/kubectl/kubelet
+  apt:
+    name: '{{ k8s_packages }}'
+    state: installed
+    force: yes
+
+- name: Fixate versions
+  with_items: '{{ k8s_packages }}'
+  dpkg_selections:
+    name: '{{ item }}'
+    selection: hold
