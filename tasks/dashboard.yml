@@ -2,7 +2,7 @@
 
 - name: Deploy kubernetes dashboard into cluster
   command: |
-    kubectl apply -f https://raw.githubusercontent.com/kubernetes/dashboard/master/aio/deploy/recommended/kubernetes-dashboard.yaml
+    kubectl apply -f https://raw.githubusercontent.com/kubernetes/dashboard/master/aio/deploy/recommended.yaml
   register: create_result
   until: create_result.rc == 0
   retries: 5

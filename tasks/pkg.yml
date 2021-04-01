@@ -1,6 +1,7 @@
 ---
 
 - name: Install google apt repo
+  when: ansible_distribution != 'Archlinux'
   include_role:
     name: yourlabs.aptrepo
   vars:
@@ -8,14 +9,20 @@
     key_url: https://packages.cloud.google.com/apt/doc/apt-key.gpg
     repo: deb [arch=amd64] https://apt.kubernetes.io/ kubernetes-xenial main
 
-- name: Install kubeadm/kubectl/kubelet
+- name: Install kubeadm/kubectl/kubelet (not Archlinux)
+  when: ansible_distribution != 'Archlinux'
   apt:
     name: '{{ k8s_packages }}'
-    state: installed
+    state: present
     force: yes
 
 - name: Fixate versions
+  when: ansible_distribution != 'Archlinux'
   with_items: '{{ k8s_packages }}'
   dpkg_selections:
     name: '{{ item }}'
     selection: hold
+
+- name: Install kubeadm/kubectl/kubelet (Archlinux)
+  when: ansible_distribution == 'Archlinux'
+  shell: "yes | pacman -Sy kubeadm kubectl kubelet && systemctl enable kubelet.service && systemctl start kubelet.service"
